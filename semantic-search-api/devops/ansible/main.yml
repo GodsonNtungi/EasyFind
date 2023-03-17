@@ -1,0 +1,9 @@
+---
+- hosts: webservers
+  become: yes
+
+  roles:
+    - flask-app
+
+  vars:
+    traefik_docker_network_name: traefik_network

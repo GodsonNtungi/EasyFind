@@ -1,0 +1,51 @@
+---
+
+- name: Stop container if exists
+  docker_container:
+    name: "{{ HOSTNAME }}"
+    state: absent
+    force_kill: true
+
+- name: Remove image
+  docker_image:
+    state: absent
+    name:  "{{ IMAGE }}"
+    tag: "{{ IMAGE_TAG }}"
+    force_absent: true
+
+- name: Login to Docker via vars/main.yaml
+  shell: "echo \"{{ DOCKER_TOKEN }}\" | docker login ghcr.io -u {{ DOCKER_USERNAME }} --password-stdin"
+
+- name: "Run {{ HOSTNAME }}"
+  vars:
+    image_labels:
+      - key: "com.centurylinklabs.watchtower.enable"
+        value: "true"
+      - key: "traefik.enable"
+        value: "true"
+
+      # attempting wildcard domain
+      - key: "traefik.http.routers.{{ HOSTNAME }}.rule"
+        value: "Host(`{{ DOMAIN_NAME }}`)"
+      - key: "traefik.http.routers.{{ HOSTNAME }}.entrypoints"
+        value: "websecure"
+      - key: "traefik.http.routers.{{ HOSTNAME }}.tls"
+        value: "true"
+      - key: "traefik.http.routers.{{ HOSTNAME }}.tls.certresolver"
+        value: "production"
+
+
+  docker_container:
+    name: "{{ HOSTNAME }}"
+    image: "{{ IMAGE }}:{{ IMAGE_TAG }}"
+    restart_policy: "always"
+    env:
+      API_KEY: "{{API_KEY}}"
+      Qdrant_key: "{{Qdrant_key}}"
+    expose:
+      - 5000
+
+    networks:
+      - name: "{{ traefik_docker_network_name }}"
+    labels: "{{ image_labels | items2dict }}"
+

@@ -1,5 +1,6 @@
 ## Ecommerce-Semantic-Search
 The project involves two parts the Ecommerce website and the Semantic search API
+The link to the hosted project [The website](https://mchongotz.co.tz)
 
 ### Semantic Search API
 
@@ -13,5 +14,5 @@ The API integrates with both the Qdrant vector database and the Cohere multiling
 
 The API is also designed to be multilingual, allowing users to search for items in multiple languages. This is achieved by leveraging the multilingual capabilities of the Cohere model, which can understand and process text in a variety of languages.
 
-This is a link to the  [Search-API](https://semantic-search.site.atomatiki.tech/)
+The link to the  [Search-API](https://semantic-search.site.atomatiki.tech/)
 

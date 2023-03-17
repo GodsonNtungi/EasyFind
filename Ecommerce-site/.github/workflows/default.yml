@@ -1,0 +1,23 @@
+name: default
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+jobs:
+
+  nodejs_ci:
+    uses: ./.github/workflows/node.js.yml
+    with:
+      SUPABASE_ANON_KEY: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImpqZG9sZmxyamR3ZnNmY2l6cXZrIiwicm9sZSI6ImFub24iLCJpYXQiOjE2NjY0Njc2ODgsImV4cCI6MTk4MjA0MzY4OH0.7OnIlAlEIwqlpxxucV7fbFEypyZDVLbATWVHJb_PNM8
+      SUPABASE_URL: https://jjdolflrjdwfsfcizqvk.supabase.co
+
+  build_container:
+    needs: nodejs_ci
+    uses: ./.github/workflows/container.yml
+    with:
+      SUPABASE_ANON_KEY: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImpqZG9sZmxyamR3ZnNmY2l6cXZrIiwicm9sZSI6ImFub24iLCJpYXQiOjE2NjY0Njc2ODgsImV4cCI6MTk4MjA0MzY4OH0.7OnIlAlEIwqlpxxucV7fbFEypyZDVLbATWVHJb_PNM8
+      SUPABASE_URL: https://jjdolflrjdwfsfcizqvk.supabase.co

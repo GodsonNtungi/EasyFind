@@ -1,0 +1,11 @@
+name: default-no-tests
+
+on:
+  workflow_dispatch:
+
+jobs:
+  build_container:
+    uses: ./.github/workflows/container.yml
+    with:
+      SUPABASE_ANON_KEY: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImpqZG9sZmxyamR3ZnNmY2l6cXZrIiwicm9sZSI6ImFub24iLCJpYXQiOjE2NjY0Njc2ODgsImV4cCI6MTk4MjA0MzY4OH0.7OnIlAlEIwqlpxxucV7fbFEypyZDVLbATWVHJb_PNM8
+      SUPABASE_URL: https://jjdolflrjdwfsfcizqvk.supabase.co

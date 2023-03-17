@@ -1,0 +1,81 @@
+name: deploy
+
+on:
+  workflow_dispatch:
+    inputs:
+      TARGET_HOST:
+        type: string
+        required: true
+      HOSTNAME:
+        type: string
+        required: true
+      DOMAIN_NAME:
+        type: string
+        required: true
+      BACKEND_SECRET:
+        type: string
+        required: true
+      IMAGE_TAG:
+        type: string
+        required: false
+        default: main
+env:
+  REGISTRY: ghcr.io
+  IMAGE_NAME: oceanware/mchongotz-eshop
+
+jobs:
+  ansible:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkoutf
+        uses: actions/checkout@v2
+
+      - name: Add SSH Keys
+        run: |
+          cat << EOF > devops/ansible/devops-key
+          ${{ secrets.SSH_DEVOPS_KEY_PRIVATE }}
+          EOF
+      - name: Update devops private key permissions
+        run: |
+          chmod 400 devops/ansible/devops-key
+      - name: Install Ansible
+        run: |
+          pip install ansible
+
+      - name: Adding or Override Ansible Config File
+        run: |
+          cat << EOF > ./devops/ansible/ansible.cfg
+          [defaults]
+          ansible_python_interpreter='/usr/bin/python3'
+          deprecation_warnings=False
+          inventory=./inventory.ini
+          remote_user="root"
+          host_key_checking=False
+          private_key_file = ./devops-key
+          retries=2
+          EOF
+
+      - name: Adding or Override Ansible inventory File
+        run: |
+          cat << EOF > ./devops/ansible/inventory.ini
+          [webservers]
+          ${{ inputs.TARGET_HOST }}
+          EOF
+
+      - name: Adding Ansible Variables
+        run: |
+          mkdir -p devops/ansible/web-app/vars/
+          cat << EOF > devops/ansible/web-app/vars/main.yaml
+          ---
+          HOSTNAME: "${{ inputs.HOSTNAME }}"
+          IMAGE: "${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}"
+          IMAGE_TAG: "${{ inputs.IMAGE_TAG }}"
+          DOMAIN_NAME: "${{ inputs.DOMAIN_NAME }}"
+          DOCKER_TOKEN: "${{ secrets.DOCKER_TOKEN }}"
+          DOCKER_USERNAME: "jackkweyunga"
+          BACKEND_SECRET: "${{ inputs.BACKEND_SECRET }}"
+          EOF
+
+      - name: Run main playbook
+        run: |
+          ANSIBLE_CONFIG=devops/ansible/ansible.cfg ansible-playbook devops/ansible/main.yml
